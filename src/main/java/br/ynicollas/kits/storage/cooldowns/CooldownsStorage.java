@@ -16,9 +16,7 @@ import java.util.logging.Logger;
 public class CooldownsStorage {
 
     private final Database database;
-
     private final CooldownsCache cooldownsCache;
-
     private static final Logger LOGGER = Bukkit.getLogger();
 
     public CooldownsStorage(Database database, CooldownsCache cooldownsCache) {
@@ -27,14 +25,19 @@ public class CooldownsStorage {
     }
 
     public void addCooldown(Player player, String kit, KitCooldown cooldown) {
-        cooldownsCache.addCooldown(player, kit, cooldown.getMilliseconds());
+        long expireTime = System.currentTimeMillis() + cooldown.getMilliseconds();
 
-        String query = "INSERT OR REPLACE INTO cooldowns (player, kit, expire_time) VALUES (?, ?, ?)";
+        cooldownsCache.addCooldown(player, kit, expireTime);
+
+        String query;
+        if (database.getStorageType().equals("mariadb")) {
+            query = "REPLACE INTO cooldowns (player, kit, expire_time) VALUES (?, ?, ?)";
+        } else {
+            query = "INSERT OR REPLACE INTO cooldowns (player, kit, expire_time) VALUES (?, ?, ?)";
+        }
 
         try (Connection connection = database.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
-
-            long expireTime = System.currentTimeMillis() + cooldown.getMilliseconds();
 
             statement.setString(1, player.getName());
             statement.setString(2, kit);
@@ -63,12 +66,11 @@ public class CooldownsStorage {
                 if (resultSet.next()) {
                     long expireTime = resultSet.getLong("expire_time");
 
-                    cooldownsCache.addCooldown(player, id, expireTime - System.currentTimeMillis());
+                    cooldownsCache.addCooldown(player, id, expireTime);
 
                     return expireTime;
                 }
             }
-
         } catch (SQLException exception) {
             LOGGER.log(Level.SEVERE, "Failed to get cooldown for player: " + player.getName(), exception);
         }
@@ -77,8 +79,9 @@ public class CooldownsStorage {
     }
 
     public boolean hasCooldown(Player player, String kit) {
-        long cooldown = getCooldown(player, kit);
-        return cooldown > System.currentTimeMillis();
+        long cooldownExpireTime = getCooldown(player, kit);
+
+        return cooldownExpireTime > System.currentTimeMillis();
     }
 
     public void removeCooldown(Player player, String kit) {

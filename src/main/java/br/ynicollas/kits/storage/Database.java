@@ -1,85 +1,122 @@
 package br.ynicollas.kits.storage;
 
 import br.ynicollas.kits.KitsPlugin;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Database {
 
-    private Connection connection;
-
-    private final File dataFolder;
     private final Logger logger;
+    private final File dataFolder;
+    private final FileConfiguration config;
+
+    private HikariDataSource dataSource;
+    private String storageType;
 
     public Database(KitsPlugin plugin) {
-        this.dataFolder = plugin.getDataFolder();
         this.logger = plugin.getLogger();
+        this.dataFolder = plugin.getDataFolder();
+        this.config = plugin.getConfig();
     }
 
-    private String getDatabaseUrl() {
+    public void openConnection() {
+        this.storageType = config.getString("storage.type", "sqlite").toLowerCase();
+
+        HikariConfig hikariConfig = new HikariConfig();
+
+        try {
+            if (storageType.equals("mariadb")) {
+                logger.info("Storage type set to MariaDB. Connecting...");
+
+                hikariConfig.setDriverClassName("org.mariadb.jdbc.Driver");
+
+                hikariConfig.setJdbcUrl("jdbc:mariadb://" +
+                        config.getString("storage.mariadb.host", "127.0.0.1") + ":" +
+                        config.getInt("storage.mariadb.port", 3306) + "/" +
+                        config.getString("storage.mariadb.database", "kits")
+                );
+
+                hikariConfig.setUsername(config.getString("storage.mariadb.username", "root"));
+                hikariConfig.setPassword(config.getString("storage.mariadb.password", "password"));
+
+            } else {
+                logger.info("Storage type set to SQLite. Connecting...");
+
+                hikariConfig.setDriverClassName("org.sqlite.JDBC");
+                hikariConfig.setJdbcUrl(getSQLiteUrl());
+            }
+
+            hikariConfig.setPoolName("Kits-Pool-" + storageType.toUpperCase());
+            hikariConfig.setMaxLifetime(1800000);
+            hikariConfig.setMaximumPoolSize(10);
+            hikariConfig.setMinimumIdle(2);
+
+            this.dataSource = new HikariDataSource(hikariConfig);
+
+            createTables();
+        } catch (Exception exception) {
+            logger.log(Level.SEVERE, "Failed to open database connection.", exception);
+        }
+    }
+
+    public Connection getConnection() throws SQLException {
+        if (dataSource == null) {
+            throw new SQLException("Database connection is not initialized.");
+        }
+
+        return dataSource.getConnection();
+    }
+
+    public void closeConnection() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
+        }
+    }
+
+    public String getStorageType() {
+        if (this.storageType == null) {
+            return config.getString("storage.type", "sqlite").toLowerCase();
+        }
+
+        return this.storageType;
+    }
+
+    private String getSQLiteUrl() {
         if (!dataFolder.exists() && !dataFolder.mkdirs()) {
             logger.log(Level.SEVERE, "Failed to create plugin data folder: " + dataFolder.getAbsolutePath());
         }
-
         File databaseFile = new File(dataFolder, "kits.db");
         return "jdbc:sqlite:" + databaseFile.getAbsolutePath();
     }
 
-    public void openConnection() {
-        synchronized (this) {
-            try {
-                if (connection == null || connection.isClosed()) {
-                    Class.forName("org.sqlite.JDBC");
-
-                    connection = DriverManager.getConnection(getDatabaseUrl());
-
-                    createTables();
-                }
-            } catch (ClassNotFoundException | SQLException exception) {
-                logger.log(Level.SEVERE, "Failed to open database connection.", exception);
-            }
-        }
-    }
-
-    public Connection getConnection() {
-        try {
-            if (connection == null || connection.isClosed()) {
-                openConnection();
-            }
-
-        } catch (SQLException exception) {
-            logger.log(Level.SEVERE, "Error checking database connection.", exception);
-        }
-
-        return connection;
-    }
-
-    public void closeConnection() {
-        synchronized (this) {
-            try {
-                if (connection != null && !connection.isClosed()) {
-                    connection.close();
-                    connection = null;
-                }
-
-            } catch (SQLException exception) {
-                logger.log(Level.SEVERE, "Failed to close database connection.", exception);
-            }
-        }
-    }
-
     private void createTables() {
-        if (connection == null) {
-            logger.log(Level.SEVERE, "Cannot create tables: No database connection.");
-            return;
-        }
+        try (Connection conn = getConnection(); Statement statement = conn.createStatement()) {
 
-        try (Statement statement = connection.createStatement()) {
-            statement.execute("CREATE TABLE IF NOT EXISTS kits (kit TEXT PRIMARY KEY, permission TEXT, cooldown INTEGER, content TEXT)");
-            statement.execute("CREATE TABLE IF NOT EXISTS cooldowns (player TEXT, kit TEXT, expire_time INTEGER, PRIMARY KEY(player, kit))");
+            String kitsTable = "CREATE TABLE IF NOT EXISTS kits (" +
+                    "kit VARCHAR(64) NOT NULL PRIMARY KEY, " +
+                    "permission VARCHAR(128), " +
+                    "cooldown BIGINT DEFAULT 0, " +
+                    "content TEXT NOT NULL" +
+                    ")";
+
+            String cooldownsTable = "CREATE TABLE IF NOT EXISTS cooldowns (" +
+                    "player VARCHAR(16) NOT NULL, " +
+                    "kit VARCHAR(64) NOT NULL, " +
+                    "expire_time BIGINT NOT NULL, " +
+                    "PRIMARY KEY(player, kit)" +
+                    ")";
+
+            statement.execute(kitsTable);
+            statement.execute(cooldownsTable);
+
         } catch (SQLException exception) {
             logger.log(Level.SEVERE, "Failed to create database tables.", exception);
         }

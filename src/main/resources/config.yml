@@ -1,0 +1,9 @@
+storage:
+  # MariaDB ou SQLite
+  type: "sqlite"
+  mariadb:
+    host: "127.0.0.1"
+    port: 3306
+    database: "kits"
+    username: "root"
+    password: "password"

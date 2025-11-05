@@ -9,9 +9,9 @@ public class CooldownsCache {
 
     private final Map<String, Map<String, Long>> cooldownsCache = new ConcurrentHashMap<>();
 
-    public void addCooldown(Player player, String id, long duration) {
+    public void addCooldown(Player player, String id, long expireTime) {
         cooldownsCache.computeIfAbsent(player.getName(), key -> new ConcurrentHashMap<>())
-                .put(id, System.currentTimeMillis() + duration);
+                .put(id, expireTime);
     }
 
     public void removeCooldown(Player player, String id) {

@@ -18,6 +18,8 @@ public class KitsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
+
         initializeStorages();
         registerComponents();
     }

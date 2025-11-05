@@ -29,7 +29,12 @@ public class KitsStorage {
     }
 
     public void saveKit(Kit kit) {
-        String query = "INSERT OR REPLACE INTO kits (kit, permission, cooldown, content) VALUES (?, ?, ?, ?)";
+        String query;
+        if (database.getStorageType().equals("mariadb")) {
+            query = "REPLACE INTO kits (kit, permission, cooldown, content) VALUES (?, ?, ?, ?)";
+        } else {
+            query = "INSERT OR REPLACE INTO kits (kit, permission, cooldown, content) VALUES (?, ?, ?, ?)";
+        }
 
         try (Connection connection = database.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
