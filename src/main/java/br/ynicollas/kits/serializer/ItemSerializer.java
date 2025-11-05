@@ -1,23 +1,29 @@
 package br.ynicollas.kits.serializer;
 
 import org.bukkit.Bukkit;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ItemSerializer {
+public final class ItemSerializer {
 
     private static final Logger LOGGER = Bukkit.getLogger();
 
+    private ItemSerializer() {
+        throw new UnsupportedOperationException("Utitily class.");
+    }
+
     public static String serialize(ItemStack[] items) {
         if (items == null || items.length == 0) {
-            LOGGER.warning("Attempt to serialize an empty or null array.");
+            LOGGER.fine("Tentativa de serializar um array de itens nulo ou vazio.");
             return "";
         }
 
@@ -31,15 +37,16 @@ public class ItemSerializer {
             }
 
             return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+
         } catch (IOException exception) {
-            LOGGER.log(Level.SEVERE, "Error serializing items", exception);
+            LOGGER.log(Level.SEVERE, "Erro ao serializar itens", exception);
             return "";
         }
     }
 
     public static ItemStack[] deserialize(String data) {
         if (data == null || data.isEmpty()) {
-            LOGGER.warning("Attempt to serialize an empty or null array.");
+            LOGGER.warning("Tentativa de deserializar uma string nula ou vazia.");
             return new ItemStack[0];
         }
 
@@ -54,8 +61,9 @@ public class ItemSerializer {
             }
 
             return items;
-        } catch (IOException | ClassNotFoundException exception) {
-            LOGGER.log(Level.SEVERE, "Error deserializing items", exception);
+
+        } catch (IOException | ClassNotFoundException | IllegalArgumentException exception) {
+            LOGGER.log(Level.SEVERE, "Erro ao deserializar itens", exception);
             return new ItemStack[0];
         }
     }
