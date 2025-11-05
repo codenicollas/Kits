@@ -17,10 +17,6 @@ public final class ItemSerializer {
 
     private static final Logger LOGGER = Bukkit.getLogger();
 
-    private ItemSerializer() {
-        throw new UnsupportedOperationException("Utitily class.");
-    }
-
     public static String serialize(ItemStack[] items) {
         if (items == null || items.length == 0) {
             LOGGER.fine("Tentativa de serializar um array de itens nulo ou vazio.");
