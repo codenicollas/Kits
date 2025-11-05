@@ -52,6 +52,8 @@ public class Database {
 
                 hikariConfig.setDriverClassName("org.sqlite.JDBC");
                 hikariConfig.setJdbcUrl(getSQLiteUrl());
+
+                hikariConfig.setConnectionTestQuery("SELECT 1");
             }
 
             hikariConfig.setPoolName("Kits-Pool-" + storageType.toUpperCase());
