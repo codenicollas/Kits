@@ -56,7 +56,7 @@ public class Database {
                 hikariConfig.setConnectionTestQuery("SELECT 1");
             }
 
-            hikariConfig.setPoolName("Kits-Pool-" + storageType.toUpperCase());
+            hikariConfig.setPoolName("kits-pool" + storageType.toUpperCase());
             hikariConfig.setMaxLifetime(1800000);
             hikariConfig.setMaximumPoolSize(10);
             hikariConfig.setMinimumIdle(2);

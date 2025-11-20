@@ -24,7 +24,7 @@ public class KitsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getLogger().info("Iniciando Kits v" + getDescription().getVersion() + "...");
+        getLogger().info("Starting Kits v" + getDescription().getVersion() + "...");
 
         saveDefaultConfig();
 
@@ -33,7 +33,7 @@ public class KitsPlugin extends JavaPlugin {
         registerCommands();
         registerListeners();
 
-        getLogger().info("Plugin Kits v" + getDescription().getVersion() + " habilitado com sucesso!");
+        getLogger().info("Plugin Kits v" + getDescription().getVersion() + " successfully enabled!");
     }
 
     @Override
@@ -42,7 +42,7 @@ public class KitsPlugin extends JavaPlugin {
             database.closeConnection();
         }
 
-        getLogger().info("Plugin Kits desabilitado.");
+        getLogger().info("Plugin Kits disabled.");
     }
 
     private void setupDatabase() {
@@ -58,7 +58,7 @@ public class KitsPlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
-        getLogger().info("Registrando comandos...");
+        getLogger().info("Registering commands...");
 
         registerCommand("createkit", new CreateKitCommand(kits));
         registerCommand("deletekit", new DeleteKitCommand(cooldowns, kits));
@@ -69,7 +69,7 @@ public class KitsPlugin extends JavaPlugin {
     }
 
     private void registerListeners() {
-        getLogger().info("Registrando listeners...");
+        getLogger().info("Registering listeners...");
 
         getServer().getPluginManager().registerEvents(new InventoryCloseListener(kits), this);
         getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
@@ -82,7 +82,7 @@ public class KitsPlugin extends JavaPlugin {
         if (command != null) {
             command.setExecutor(executor);
         } else {
-            getLogger().severe("Falha ao registrar o comando '" + commandName + "'.");
+            getLogger().severe("Failed to register the command: '" + commandName + "'.");
         }
     }
 }

@@ -30,6 +30,7 @@ public class KitsStorage {
 
     public void saveKit(Kit kit) {
         String query;
+        
         if (database.getStorageType().equals("mariadb")) {
             query = "REPLACE INTO kits (kit, permission, cooldown, content) VALUES (?, ?, ?, ?)";
         } else {

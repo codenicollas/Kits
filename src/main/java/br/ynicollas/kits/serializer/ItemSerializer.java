@@ -19,7 +19,7 @@ public final class ItemSerializer {
 
     public static String serialize(ItemStack[] items) {
         if (items == null || items.length == 0) {
-            LOGGER.fine("Tentativa de serializar um array de itens nulo ou vazio.");
+            LOGGER.fine("Attempting to serialize an array of null or empty items.");
             return "";
         }
 
@@ -36,14 +36,14 @@ public final class ItemSerializer {
             return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
 
         } catch (IOException exception) {
-            LOGGER.log(Level.SEVERE, "Erro ao serializar itens", exception);
+            LOGGER.log(Level.SEVERE, "Error serializing items.", exception);
             return "";
         }
     }
 
     public static ItemStack[] deserialize(String data) {
         if (data == null || data.isEmpty()) {
-            LOGGER.warning("Tentativa de deserializar uma string nula ou vazia.");
+            LOGGER.warning("Attempt to deserialize a null or empty string.");
             return new ItemStack[0];
         }
 
@@ -60,7 +60,7 @@ public final class ItemSerializer {
             return items;
 
         } catch (IOException | ClassNotFoundException | IllegalArgumentException exception) {
-            LOGGER.log(Level.SEVERE, "Erro ao deserializar itens", exception);
+            LOGGER.log(Level.SEVERE, "Error deserializing items", exception);
             return new ItemStack[0];
         }
     }
