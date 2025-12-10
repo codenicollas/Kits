@@ -1,14 +1,11 @@
-import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.jvm.toolchain.JavaLanguageVersion
-
 plugins {
     java
     
-    id("com.gradleup.shadow") version "9.1.0"
+    id("com.gradleup.shadow") version "9.3.0"
 }
 
-group = "br.ynicollas"
-version = "1.0.9"
+group = "br.ynicollas.kits"
+version = "1.1.0"
 
 java {
     toolchain {
@@ -44,8 +41,10 @@ tasks {
         archiveBaseName.set("Kits")
         archiveClassifier.set("")
 
-        relocate("com.zaxxer.hikari", "br.ynicollas.libs.hikari")
-        relocate("org.mariadb.jdbc", "br.ynicollas.libs.mariadb")
+        relocate("com.zaxxer.hikari", "br.ynicollas.kits.libs.hikari")
+        relocate("org.mariadb.jdbc", "br.ynicollas.kits.libs.mariadb")
+        
+        relocate("org.slf4j", "br.ynicollas.kits.libs.slf4j")
     }
 
     withType<JavaCompile>().configureEach {
