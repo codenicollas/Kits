@@ -64,7 +64,7 @@ public class CreateKitCommand implements CommandExecutor {
 
         KitEditorHolder holder = new KitEditorHolder(kit);
 
-        Inventory kitInventory = Bukkit.createInventory(holder, 54, ChatColor.DARK_GRAY + "Kit");
+        Inventory kitInventory = Bukkit.createInventory(holder, 4 * 9, ChatColor.DARK_GRAY + "Kit");
         player.openInventory(kitInventory);
 
         player.sendMessage(ChatColor.YELLOW + "Kit criado! Coloque os itens no inventário e feche para salvar.");

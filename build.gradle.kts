@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "br.ynicollas.kits"
-version = "1.1.0"
+version = "1.1.1"
 
 java {
     toolchain {
@@ -15,12 +15,15 @@ java {
 
 repositories {
     mavenCentral()
-
-    maven { url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") }
+    
+    maven {
+        name = "spigot"
+        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    }   
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
 
     implementation("com.zaxxer:HikariCP:7.0.2")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.5.6")

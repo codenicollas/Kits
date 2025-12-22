@@ -49,7 +49,7 @@ public class EditKitCommand implements CommandExecutor {
 
         KitEditorHolder holder = new KitEditorHolder(kit);
 
-        Inventory kitInventory = Bukkit.createInventory(holder, 54, ChatColor.DARK_GRAY + "Kit");
+        Inventory kitInventory = Bukkit.createInventory(holder, 4 * 9, ChatColor.DARK_GRAY + "Kit");
 
         if (kit.getItems() != null) {
             kitInventory.setContents(kit.getItems());
