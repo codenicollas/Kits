@@ -117,7 +117,7 @@ public class Database {
                     "player_uuid VARCHAR(36) NOT NULL, " +
                     "kit VARCHAR(64) NOT NULL, " +
                     "expire_time BIGINT NOT NULL, " +
-                    "PRIMARY KEY(player, kit)" +
+                    "PRIMARY KEY(player_uuid, kit)" +
                     ")";
 
             statement.execute(kitsTable);
