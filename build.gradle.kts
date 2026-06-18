@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:26.1.2-R0.1-SNAPSHOT")
 
     implementation("com.zaxxer:HikariCP:7.0.2")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.5.9")
